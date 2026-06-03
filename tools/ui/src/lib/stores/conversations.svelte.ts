@@ -25,6 +25,7 @@ import { DatabaseService } from '$lib/services/database.service';
 import { MigrationService } from '$lib/services/migration.service';
 import { config } from '$lib/stores/settings.svelte';
 import { filterByLeafNodeId, findLeafNode, generateConversationTitle } from '$lib/utils';
+import { getEnvMcpServerSettings } from '$lib/utils/mcp';
 import type { McpServerOverride } from '$lib/types/database';
 import { MessageRole, HtmlInputType, FileExtensionText, ReasoningEffort } from '$lib/enums';
 import {
@@ -82,8 +83,15 @@ class ConversationsStore {
 	/** Global (non-conversation-specific) reasoning effort default */
 	pendingReasoningEffort = $state<ReasoningEffort>(ConversationsStore.loadReasoningEffortDefault());
 
-	/** Load MCP default overrides from localStorage */
+	/** Load MCP default overrides from .env, falling back to localStorage when unset */
 	private static loadMcpDefaults(): McpServerOverride[] {
+		const envServers = getEnvMcpServerSettings();
+		if (envServers !== undefined) {
+			return envServers
+				.filter((server) => server.enabled)
+				.map((server) => ({ serverId: server.id, enabled: true }));
+		}
+
 		if (typeof globalThis.localStorage === 'undefined') return [];
 		try {
 			const raw = localStorage.getItem(MCP_DEFAULT_ENABLED_LOCALSTORAGE_KEY);
@@ -98,8 +106,9 @@ class ConversationsStore {
 		}
 	}
 
-	/** Persist MCP default overrides to localStorage */
+	/** Persist MCP default overrides to localStorage unless .env controls them */
 	private saveMcpDefaults(): void {
+		if (getEnvMcpServerSettings() !== undefined) return;
 		if (typeof globalThis.localStorage === 'undefined') return;
 		const plain = this.pendingMcpServerOverrides.map((o) => ({
 			serverId: o.serverId,

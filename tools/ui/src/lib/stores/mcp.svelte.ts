@@ -525,9 +525,20 @@ class MCPStore {
 		);
 	}
 
+	get isConfiguredFromEnv(): boolean {
+		return getEnvMcpServersConfig() !== undefined;
+	}
+
 	addServer(
 		serverData: Omit<MCPServerSettingsEntry, 'id' | 'requestTimeoutSeconds'> & { id?: string }
 	): void {
+		if (this.isConfiguredFromEnv) {
+			console.warn(
+				'[MCP] MCP servers are configured from .env and cannot be changed in localStorage.'
+			);
+			return;
+		}
+
 		const servers = this.getServers();
 		const newServer: MCPServerSettingsEntry = {
 			id: serverData.id || (uuid() ?? `server-${Date.now()}`),
@@ -543,6 +554,13 @@ class MCPStore {
 	}
 
 	updateServer(id: string, updates: Partial<MCPServerSettingsEntry>): void {
+		if (this.isConfiguredFromEnv) {
+			console.warn(
+				'[MCP] MCP servers are configured from .env and cannot be changed in localStorage.'
+			);
+			return;
+		}
+
 		const servers = this.getServers();
 		settingsStore.updateConfig(
 			SETTINGS_KEYS.MCP_SERVERS,
@@ -553,6 +571,13 @@ class MCPStore {
 	}
 
 	removeServer(id: string): void {
+		if (this.isConfiguredFromEnv) {
+			console.warn(
+				'[MCP] MCP servers are configured from .env and cannot be changed in localStorage.'
+			);
+			return;
+		}
+
 		const servers = this.getServers();
 		settingsStore.updateConfig(
 			SETTINGS_KEYS.MCP_SERVERS,

@@ -42,6 +42,7 @@ import {
 	USER_OVERRIDES_LOCALSTORAGE_KEY
 } from '$lib/constants';
 import { isMobile } from '$lib/stores/viewport.svelte';
+import { getEnvMcpServersConfig } from '$lib/utils/mcp';
 import { ParameterSyncService } from '$lib/services/parameter-sync.service';
 import { serverStore } from '$lib/stores/server.svelte';
 import {
@@ -128,6 +129,11 @@ class SettingsStore {
 				...SETTING_CONFIG_DEFAULT,
 				...savedVal
 			};
+
+			const envMcpServers = getEnvMcpServersConfig();
+			if (envMcpServers !== undefined) {
+				this.config[SETTINGS_KEYS.MCP_SERVERS] = envMcpServers;
+			}
 
 			// Default sendOnEnter to false on mobile when the user has no saved preference
 			if (!(SETTINGS_KEYS.SEND_ON_ENTER in savedVal)) {
@@ -236,7 +242,12 @@ class SettingsStore {
 		if (!browser) return;
 
 		try {
-			localStorage.setItem(CONFIG_LOCALSTORAGE_KEY, JSON.stringify(this.config));
+			const configToSave = { ...this.config };
+			if (getEnvMcpServersConfig() !== undefined) {
+				delete configToSave[SETTINGS_KEYS.MCP_SERVERS];
+			}
+
+			localStorage.setItem(CONFIG_LOCALSTORAGE_KEY, JSON.stringify(configToSave));
 
 			localStorage.setItem(
 				USER_OVERRIDES_LOCALSTORAGE_KEY,

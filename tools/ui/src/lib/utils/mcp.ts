@@ -34,6 +34,36 @@ import {
 import type { Component } from 'svelte';
 import type { MimeTypeUnion } from '$lib/types/common';
 
+const MCP_SERVERS_ENV_VALUE =
+	import.meta.env.VITE_PUBLIC_MCP_SERVERS ?? import.meta.env.VITE_MCP_SERVERS;
+
+/**
+ * Returns the MCP server list configured via Vite environment variables.
+ *
+ * Set VITE_PUBLIC_MCP_SERVERS (or VITE_MCP_SERVERS) in tools/ui/.env to a JSON
+ * array of MCP server entries.
+ * Returning undefined means the variable is not configured, so callers can fall back to
+ * user-local settings for existing deployments.
+ */
+export function getEnvMcpServersConfig(): string | undefined {
+	if (typeof MCP_SERVERS_ENV_VALUE !== 'string') return undefined;
+
+	const trimmed = MCP_SERVERS_ENV_VALUE.trim();
+	return trimmed ? trimmed : undefined;
+}
+
+/**
+ * Parses MCP server entries configured through tools/ui/.env.
+ * Returns undefined when VITE_PUBLIC_MCP_SERVERS is absent, and an empty list when it
+ * is present but empty/invalid after parsing.
+ */
+export function getEnvMcpServerSettings(): MCPServerSettingsEntry[] | undefined {
+	const envConfig = getEnvMcpServersConfig();
+	if (envConfig === undefined) return undefined;
+
+	return parseMcpServerSettings(envConfig);
+}
+
 /**
  * Detects the MCP transport type from a URL.
  * WebSocket URLs (ws:// or wss://) use 'websocket', others use 'streamable_http'.
