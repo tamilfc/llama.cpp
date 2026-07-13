@@ -30,7 +30,7 @@ import { ToolSource, ToolPermissionDecision } from '$lib/enums';
 import { SvelteMap } from 'svelte/reactivity';
 import { ToolsService } from '$lib/services/tools.service';
 import { isAbortError } from '$lib/utils';
-import { DEFAULT_AGENTIC_CONFIG, NEWLINE_SEPARATOR } from '$lib/constants';
+import { DEFAULT_AGENTIC_CONFIG, NEWLINE_SEPARATOR, SETTINGS_KEYS } from '$lib/constants';
 import {
 	IMAGE_MIME_TO_EXTENSION,
 	DATA_URI_BASE64_REGEX,
@@ -306,6 +306,10 @@ class AgenticStore {
 		signal?: AbortSignal
 	): Promise<ToolPermissionDecision> {
 		const permissionKey = toolsStore.getPermissionKey(toolName);
+		if (config[SETTINGS_KEYS.AGENTIC_ALWAYS_ALLOW_TOOLS]) {
+			return ToolPermissionDecision.ONCE;
+		}
+
 		if (permissionKey && permissionsStore.hasTool(permissionKey)) {
 			return ToolPermissionDecision.ONCE;
 		}
