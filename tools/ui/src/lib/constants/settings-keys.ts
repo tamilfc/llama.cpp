@@ -58,6 +58,7 @@ export const SETTINGS_KEYS = {
 	MCP_SERVERS: 'mcpServers',
 	MCP_REQUEST_TIMEOUT_SECONDS: 'mcpRequestTimeoutSeconds',
 	AGENTIC_MAX_TURNS: 'agenticMaxTurns',
+	AGENTIC_ALWAYS_ALLOW_TOOLS: 'agenticAlwaysAllowTools',
 	ALWAYS_SHOW_AGENTIC_TURNS: 'alwaysShowAgenticTurns',
 	AGENTIC_MAX_TOOL_PREVIEW_LINES: 'agenticMaxToolPreviewLines',
 	SHOW_TOOL_CALL_IN_PROGRESS: 'showToolCallInProgress',

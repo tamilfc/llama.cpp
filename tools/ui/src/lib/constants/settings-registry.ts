@@ -623,6 +623,14 @@ const SETTINGS_REGISTRY: Record<string, SettingsSectionEntry> = {
 				}
 			},
 			{
+				key: SETTINGS_KEYS.AGENTIC_ALWAYS_ALLOW_TOOLS,
+				label: 'Always allow tools',
+				help: 'Automatically approve tool calls without showing the permission prompt. Disabled by default for safety.',
+				defaultValue: false,
+				type: SettingsFieldType.CHECKBOX,
+				section: SETTINGS_SECTION_SLUGS.AGENTIC
+			},
+			{
 				key: SETTINGS_KEYS.AGENTIC_MAX_TOOL_PREVIEW_LINES,
 				label: 'Max lines per tool preview',
 				help: 'Number of lines shown in tool output previews (last N lines). Only these previews and the final LLM response persist after the agentic loop completes.',
